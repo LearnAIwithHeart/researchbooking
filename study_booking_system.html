@@ -1,0 +1,941 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1916;
+    --text2: #6b6860;
+    --text3: #999790;
+    --accent: #2563eb;
+    --accent-bg: #eff4ff;
+    --accent-text: #1d4ed8;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --success-text: #15803d;
+    --warn: #d97706;
+    --warn-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --r: 10px;
+    --r2: 6px;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .app { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo { font-size: 16px; font-weight: 500; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .tab-bar { display: flex; gap: 4px; }
+  .tab {
+    padding: 6px 14px;
+    border-radius: var(--r2);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text2);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab:hover { background: var(--surface2); color: var(--text); }
+  .tab.active { background: var(--accent); color: #fff; font-weight: 500; }
+
+  .content { flex: 1; padding: 28px 24px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+  /* ── Panels ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-size: 15px; font-weight: 500; }
+  .card-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* ── Form elements ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="datetime-local"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--r2);
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--r2);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font);
+    cursor: pointer;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text);
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); border-color: rgba(220,38,38,0.2); }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-ghost { border-color: transparent; }
+  .btn-ghost:hover { background: var(--surface2); border-color: var(--border); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .badge-blue { background: var(--accent-bg); color: var(--accent-text); }
+  .badge-green { background: var(--success-bg); color: var(--success-text); }
+  .badge-amber { background: var(--warn-bg); color: var(--warn); }
+  .badge-gray { background: var(--surface2); color: var(--text2); }
+  .badge-red { background: var(--danger-bg); color: var(--danger); }
+
+  /* ── Slot list ── */
+  .slot-item {
+    border: 1px solid var(--border);
+    border-radius: var(--r2);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--surface);
+    transition: border-color 0.15s;
+  }
+  .slot-item:hover { border-color: var(--border2); }
+  .slot-item.full { opacity: 0.6; }
+  .slot-left { display: flex; align-items: center; gap: 14px; }
+  .slot-icon {
+    width: 40px; height: 40px;
+    border-radius: var(--r2);
+    background: var(--accent-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--accent-text);
+    flex-shrink: 0;
+  }
+  .slot-date { font-weight: 500; font-size: 14px; }
+  .slot-time { font-size: 13px; color: var(--text2); margin-top: 1px; }
+  .slot-meta { font-size: 12px; color: var(--text3); margin-top: 3px; font-family: var(--mono); }
+  .slot-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* ── Booking form overlay ── */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--r);
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+  .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── Report ── */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--surface2);
+    border-radius: var(--r);
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-size: 24px; font-weight: 500; letter-spacing: -0.5px; }
+  .stat-value.blue { color: var(--accent-text); }
+  .stat-value.green { color: var(--success); }
+
+  .bookings-table { width: 100%; border-collapse: collapse; }
+  .bookings-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bookings-table td {
+    padding: 11px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .bookings-table tr:last-child td { border-bottom: none; }
+  .bookings-table tr:hover td { background: var(--surface2); }
+
+  /* ── Progress bar ── */
+  .progress-wrap { background: var(--surface2); border-radius: 99px; height: 6px; margin-top: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.3s; }
+
+  /* ── Notifications area ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: var(--r);
+    font-size: 13px;
+    z-index: 999;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    max-width: 320px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Empty state ── */
+  .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* ── Template area ── */
+  .template-preview {
+    background: var(--surface2);
+    border-radius: var(--r2);
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text2);
+    border-left: 3px solid var(--accent);
+    margin-top: 8px;
+  }
+  .template-var { font-family: var(--mono); font-size: 12px; background: var(--surface); padding: 1px 5px; border-radius: 4px; color: var(--accent-text); border: 1px solid var(--border); }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  hr { border: none; border-top: 1px solid var(--border); }
+
+  .section-title { font-size: 13px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+  /* ── Confirmation screen ── */
+  .confirm-screen {
+    text-align: center;
+    padding: 32px 20px;
+  }
+  .confirm-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--success-bg);
+    color: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 20px;
+  }
+  .confirm-title { font-size: 20px; font-weight: 500; margin-bottom: 8px; }
+  .confirm-sub { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .confirm-details {
+    background: var(--surface2);
+    border-radius: var(--r);
+    padding: 16px;
+    margin: 20px 0;
+    text-align: left;
+    font-size: 13px;
+  }
+  .confirm-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .confirm-row + .confirm-row { border-top: 1px solid var(--border); }
+
+  /* Inline flex helpers */
+  .flex { display: flex; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+  .flex-center { display: flex; align-items: center; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .mt-4 { margin-top: 4px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-0 { margin-bottom: 0; }
+
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 12px; }
+  .text-muted { color: var(--text2); }
+  .text-mono { font-family: var(--mono); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      StudyBook
+    </div>
+    <div class="tab-bar">
+      <button class="tab active" onclick="switchTab('researcher')">Researcher</button>
+      <button class="tab" onclick="switchTab('participant')">Participant view</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════════════════
+         RESEARCHER PANEL
+    ══════════════════════════════════════════════ -->
+    <div class="panel active" id="panel-researcher">
+
+      <!-- Sub-nav -->
+      <div class="flex gap-8 mb-0" style="margin-bottom:20px">
+        <button class="btn btn-sm active-sub" id="sub-slots" onclick="switchSub('slots')">Time slots</button>
+        <button class="btn btn-sm" id="sub-messages" onclick="switchSub('messages')">Auto messages</button>
+        <button class="btn btn-sm" id="sub-report" onclick="switchSub('report')">Report</button>
+      </div>
+
+      <!-- Slots sub-panel -->
+      <div id="subpanel-slots">
+        <div class="card">
+          <div class="card-header mb-0" style="margin-bottom:0">
+            <div>
+              <div class="card-title">Add a time slot</div>
+            </div>
+          </div>
+          <hr style="margin: 14px 0">
+          <div class="form-row">
+            <div class="form-group mb-0">
+              <label class="form-label">Date</label>
+              <input type="date" id="slot-date">
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label">Start time</label>
+              <input type="time" id="slot-time">
+            </div>
+          </div>
+          <div class="form-row mt-8" style="margin-top:12px">
+            <div class="form-group mb-0">
+              <label class="form-label">Duration (minutes)</label>
+              <input type="number" id="slot-duration" placeholder="60" min="5" max="480" value="60">
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label">Max participants</label>
+              <input type="number" id="slot-max" placeholder="1" min="1" max="100" value="1">
+            </div>
+          </div>
+          <div class="form-group mt-8" style="margin-top:12px; margin-bottom:0">
+            <label class="form-label">Location / link</label>
+            <input type="text" id="slot-location" placeholder="e.g. Room 204 or https://meet.google.com/…">
+          </div>
+          <div style="margin-top:14px; display:flex; justify-content:flex-end">
+            <button class="btn btn-primary" onclick="addSlot()">+ Add slot</button>
+          </div>
+        </div>
+
+        <!-- Slot list -->
+        <div class="flex-between" style="margin-bottom:12px">
+          <div class="section-title" style="margin-bottom:0">Upcoming slots</div>
+          <span id="slot-count-badge" class="badge badge-blue">0 slots</span>
+        </div>
+        <div id="slot-list">
+          <div class="empty">
+            <div class="empty-icon">🗓</div>
+            <div class="empty-text">No slots yet. Add your first time slot above.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages sub-panel -->
+      <div id="subpanel-messages" style="display:none">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:4px">Confirmation message</div>
+          <div class="card-sub">Sent automatically after a participant books a slot.</div>
+          <hr style="margin: 14px 0">
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" id="confirm-subject" value="Your study session is confirmed ✓">
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Message body</label>
+            <textarea id="confirm-body" style="min-height:120px">Hi {{name}},
+
+Thank you for booking a session with us! Here are your details:
+
+📅 Date & time: {{datetime}}
+📍 Location: {{location}}
+⏱ Duration: {{duration}} minutes
+
+If you need to make changes, please contact us.
+
+Best,
+The Research Team</textarea>
+          </div>
+          <div class="template-preview mt-8">
+            Available variables: <span class="template-var">{{name}}</span> <span class="template-var">{{datetime}}</span> <span class="template-var">{{location}}</span> <span class="template-var">{{duration}}</span> <span class="template-var">{{email}}</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:4px">Reminder message</div>
+          <div class="card-sub">Sent 24 hours before the scheduled slot.</div>
+          <hr style="margin: 14px 0">
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" id="reminder-subject" value="Reminder: Study session tomorrow">
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label">Message body</label>
+            <textarea id="reminder-body" style="min-height:120px">Hi {{name}},
+
+Just a reminder that your research session is tomorrow!
+
+📅 {{datetime}}
+📍 {{location}}
+
+We look forward to seeing you. Please arrive 5 minutes early.
+
+Best,
+The Research Team</textarea>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end">
+          <button class="btn btn-primary" onclick="saveMessages()">Save message templates</button>
+        </div>
+      </div>
+
+      <!-- Report sub-panel -->
+      <div id="subpanel-report" style="display:none">
+        <div class="stat-row" id="stat-row">
+          <div class="stat-card"><div class="stat-label">Total slots</div><div class="stat-value" id="stat-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">Booked</div><div class="stat-value green" id="stat-booked">0</div></div>
+          <div class="stat-card"><div class="stat-label">Available</div><div class="stat-value blue" id="stat-avail">0</div></div>
+          <div class="stat-card"><div class="stat-label">Fill rate</div><div class="stat-value" id="stat-fill">0%</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">All bookings</div>
+            <button class="btn btn-sm" onclick="exportCSV()">↓ Export CSV</button>
+          </div>
+          <div id="report-table-wrap">
+            <div class="empty">
+              <div class="empty-icon">📊</div>
+              <div class="empty-text">No bookings yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Per-slot breakdown -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Slot fill rate</div>
+          <div id="slot-breakdown">
+            <div class="text-sm text-muted">No slots to show.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /researcher panel -->
+
+
+    <!-- ══════════════════════════════════════════════
+         PARTICIPANT PANEL
+    ══════════════════════════════════════════════ -->
+    <div class="panel" id="panel-participant">
+      <div id="participant-booking-view">
+        <div style="margin-bottom:24px">
+          <div style="font-size:22px; font-weight:500; letter-spacing:-0.5px; margin-bottom:6px">Book a study session</div>
+          <div style="font-size:14px; color:var(--text2)">Choose an available time slot below. Confirmation will be sent to your email.</div>
+        </div>
+
+        <div id="participant-slots">
+          <div class="empty">
+            <div class="empty-icon">🗓</div>
+            <div class="empty-text">No available slots have been set up yet. Check back later.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation screen -->
+      <div id="participant-confirm" style="display:none">
+        <div class="card">
+          <div class="confirm-screen">
+            <div class="confirm-icon">✓</div>
+            <div class="confirm-title">Booking confirmed!</div>
+            <div class="confirm-sub">A confirmation has been sent. You'll receive a reminder 24 hours before your session.</div>
+            <div class="confirm-details" id="confirm-detail-box"></div>
+            <div style="background:var(--surface2); border-radius:var(--r); padding:14px; text-align:left">
+              <div style="font-size:12px; font-weight:500; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px">Confirmation email sent</div>
+              <div id="confirm-email-preview" style="font-size:13px; line-height:1.7; color:var(--text2); white-space:pre-wrap"></div>
+            </div>
+            <button class="btn mt-8" style="margin-top:16px" onclick="resetParticipant()">← Book another slot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+
+<!-- Booking modal -->
+<div class="modal-bg" id="booking-modal">
+  <div class="modal">
+    <div class="modal-title">Book this slot</div>
+    <div class="modal-sub" id="modal-slot-info">—</div>
+    <div class="form-group">
+      <label class="form-label">Your name</label>
+      <input type="text" id="book-name" placeholder="Jane Smith">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input type="email" id="book-email" placeholder="jane@example.com">
+    </div>
+    <div class="form-group mb-0">
+      <label class="form-label">Notes (optional)</label>
+      <textarea id="book-notes" style="min-height:60px" placeholder="Any questions or requests…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmBooking()">Confirm booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let slots = [];
+let bookings = [];
+let selectedSlotId = null;
+
+let confirmSubject = "Your study session is confirmed ✓";
+let confirmBody = document.getElementById('confirm-body').value;
+let reminderSubject = "Reminder: Study session tomorrow";
+let reminderBody = document.getElementById('reminder-body').value;
+
+// ── Utility ─────────────────────────────────────────────────────────────────
+function uid() { return Math.random().toString(36).slice(2, 9); }
+
+function fmtDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+
+function fmtTime(t) {
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hr = h % 12 || 12;
+  return `${hr}:${m.toString().padStart(2,'0')} ${ampm}`;
+}
+
+function endTime(t, dur) {
+  const [h, m] = t.split(':').map(Number);
+  const total = h * 60 + m + parseInt(dur);
+  const eh = Math.floor(total / 60) % 24;
+  const em = total % 60;
+  return `${eh.toString().padStart(2,'0')}:${em.toString().padStart(2,'0')}`;
+}
+
+function fmtDatetime(slot) {
+  return `${fmtDate(slot.date)} at ${fmtTime(slot.time)} – ${fmtTime(endTime(slot.time, slot.duration))}`;
+}
+
+function fillTemplate(tpl, data) {
+  return tpl
+    .replace(/\{\{name\}\}/g, data.name)
+    .replace(/\{\{email\}\}/g, data.email)
+    .replace(/\{\{datetime\}\}/g, data.datetime)
+    .replace(/\{\{location\}\}/g, data.location || 'TBD')
+    .replace(/\{\{duration\}\}/g, data.duration);
+}
+
+function toast(msg, dur = 2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── Tab / sub-nav ────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'participant') renderParticipantSlots();
+  if (tab === 'researcher') renderReport();
+}
+
+function switchSub(sub) {
+  ['slots','messages','report'].forEach(s => {
+    document.getElementById('subpanel-' + s).style.display = s === sub ? 'block' : 'none';
+    const btn = document.getElementById('sub-' + s);
+    if (btn) btn.style.background = s === sub ? 'var(--accent)' : '';
+    if (btn) btn.style.color = s === sub ? '#fff' : '';
+    if (btn) btn.style.borderColor = s === sub ? 'var(--accent)' : '';
+  });
+  if (sub === 'report') renderReport();
+}
+
+// Init active sub
+switchSub('slots');
+
+// ── Slot management ──────────────────────────────────────────────────────────
+function addSlot() {
+  const date = document.getElementById('slot-date').value;
+  const time = document.getElementById('slot-time').value;
+  const duration = document.getElementById('slot-duration').value || 60;
+  const max = document.getElementById('slot-max').value || 1;
+  const location = document.getElementById('slot-location').value;
+
+  if (!date || !time) { toast('Please set a date and time.'); return; }
+
+  const slot = { id: uid(), date, time, duration: parseInt(duration), max: parseInt(max), location, booked: 0 };
+  slots.push(slot);
+  slots.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+
+  document.getElementById('slot-date').value = '';
+  document.getElementById('slot-time').value = '';
+  renderSlots();
+  toast('Slot added successfully.');
+}
+
+function removeSlot(id) {
+  const slot = slots.find(s => s.id === id);
+  if (slot && slot.booked > 0) {
+    if (!confirm('This slot has bookings. Remove anyway?')) return;
+  }
+  slots = slots.filter(s => s.id !== id);
+  bookings = bookings.filter(b => b.slotId !== id);
+  renderSlots();
+  toast('Slot removed.');
+}
+
+function renderSlots() {
+  const list = document.getElementById('slot-list');
+  const badge = document.getElementById('slot-count-badge');
+  badge.textContent = slots.length + (slots.length === 1 ? ' slot' : ' slots');
+
+  if (slots.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🗓</div><div class="empty-text">No slots yet. Add your first time slot above.</div></div>`;
+    return;
+  }
+
+  list.innerHTML = slots.map(s => {
+    const avail = s.max - s.booked;
+    const pct = Math.round((s.booked / s.max) * 100);
+    const statusBadge = avail === 0
+      ? `<span class="badge badge-red">Full</span>`
+      : avail === s.max
+        ? `<span class="badge badge-blue">${avail} open</span>`
+        : `<span class="badge badge-amber">${avail} left</span>`;
+    return `<div class="slot-item${avail === 0 ? ' full' : ''}">
+      <div class="slot-left">
+        <div class="slot-icon">📅</div>
+        <div>
+          <div class="slot-date">${fmtDate(s.date)}</div>
+          <div class="slot-time">${fmtTime(s.time)} – ${fmtTime(endTime(s.time, s.duration))} · ${s.duration} min${s.location ? ' · ' + s.location : ''}</div>
+          <div class="progress-wrap" style="width:140px"><div class="progress-bar" style="width:${pct}%"></div></div>
+          <div class="slot-meta">${s.booked}/${s.max} booked</div>
+        </div>
+      </div>
+      <div class="slot-right">
+        ${statusBadge}
+        <button class="btn btn-sm btn-danger" onclick="removeSlot('${s.id}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Messages ─────────────────────────────────────────────────────────────────
+function saveMessages() {
+  confirmSubject = document.getElementById('confirm-subject').value;
+  confirmBody    = document.getElementById('confirm-body').value;
+  reminderSubject = document.getElementById('reminder-subject').value;
+  reminderBody   = document.getElementById('reminder-body').value;
+  toast('Message templates saved!');
+}
+
+// ── Participant view ──────────────────────────────────────────────────────────
+function renderParticipantSlots() {
+  const now = new Date();
+  const future = slots.filter(s => {
+    const dt = new Date(s.date + 'T' + s.time);
+    return dt > now;
+  });
+
+  const container = document.getElementById('participant-slots');
+  if (future.length === 0) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🗓</div><div class="empty-text">No available slots have been set up yet.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = future.map(s => {
+    const avail = s.max - s.booked;
+    const full = avail === 0;
+    const statusBadge = full
+      ? `<span class="badge badge-red">Fully booked</span>`
+      : avail <= 2
+        ? `<span class="badge badge-amber">${avail} spot${avail > 1 ? 's' : ''} left</span>`
+        : `<span class="badge badge-green">${avail} spot${avail > 1 ? 's' : ''} available</span>`;
+    return `<div class="slot-item${full ? ' full' : ''}" style="margin-bottom:12px">
+      <div class="slot-left">
+        <div class="slot-icon" style="${full ? 'background:var(--surface2);color:var(--text3)' : ''}">📅</div>
+        <div>
+          <div class="slot-date">${fmtDate(s.date)}</div>
+          <div class="slot-time">${fmtTime(s.time)} – ${fmtTime(endTime(s.time, s.duration))} · ${s.duration} min</div>
+          ${s.location ? `<div class="slot-meta">📍 ${s.location}</div>` : ''}
+        </div>
+      </div>
+      <div class="slot-right">
+        ${statusBadge}
+        ${!full ? `<button class="btn btn-primary btn-sm" onclick="openBooking('${s.id}')">Book slot →</button>` : '<button class="btn btn-sm" disabled style="opacity:0.4;cursor:not-allowed">Fully booked</button>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Booking modal ─────────────────────────────────────────────────────────────
+function openBooking(slotId) {
+  selectedSlotId = slotId;
+  const s = slots.find(x => x.id === slotId);
+  document.getElementById('modal-slot-info').textContent = fmtDatetime(s) + (s.location ? '  ·  ' + s.location : '');
+  document.getElementById('book-name').value = '';
+  document.getElementById('book-email').value = '';
+  document.getElementById('book-notes').value = '';
+  document.getElementById('booking-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('booking-modal').classList.remove('open');
+  selectedSlotId = null;
+}
+
+function confirmBooking() {
+  const name = document.getElementById('book-name').value.trim();
+  const email = document.getElementById('book-email').value.trim();
+  const notes = document.getElementById('book-notes').value.trim();
+
+  if (!name) { toast('Please enter your name.'); return; }
+  if (!email || !email.includes('@')) { toast('Please enter a valid email.'); return; }
+
+  const slot = slots.find(s => s.id === selectedSlotId);
+  if (!slot || slot.booked >= slot.max) { toast('This slot is no longer available.'); closeModal(); return; }
+
+  slot.booked += 1;
+
+  const booking = {
+    id: uid(),
+    slotId: slot.id,
+    name, email, notes,
+    date: slot.date,
+    time: slot.time,
+    duration: slot.duration,
+    location: slot.location,
+    bookedAt: new Date().toISOString()
+  };
+  bookings.push(booking);
+
+  closeModal();
+  showConfirmation(booking, slot);
+  renderSlots();
+}
+
+function showConfirmation(booking, slot) {
+  const dt = fmtDatetime(slot);
+  const data = { name: booking.name, email: booking.email, datetime: dt, location: slot.location || 'TBD', duration: slot.duration };
+  const emailText = fillTemplate(confirmBody, data);
+
+  document.getElementById('confirm-detail-box').innerHTML = `
+    <div class="confirm-row"><span>👤</span><div><strong>${booking.name}</strong><br><span style="font-size:12px;color:var(--text2)">${booking.email}</span></div></div>
+    <div class="confirm-row"><span>📅</span><div>${dt}</div></div>
+    ${slot.location ? `<div class="confirm-row"><span>📍</span><div>${slot.location}</div></div>` : ''}
+    <div class="confirm-row"><span>⏱</span><div>${slot.duration} minutes</div></div>
+  `;
+
+  document.getElementById('confirm-email-preview').textContent = emailText;
+  document.getElementById('participant-booking-view').style.display = 'none';
+  document.getElementById('participant-confirm').style.display = 'block';
+}
+
+function resetParticipant() {
+  document.getElementById('participant-booking-view').style.display = 'block';
+  document.getElementById('participant-confirm').style.display = 'none';
+  renderParticipantSlots();
+}
+
+// ── Report ────────────────────────────────────────────────────────────────────
+function renderReport() {
+  const totalBookings = bookings.length;
+  const totalSlots = slots.reduce((acc, s) => acc + s.max, 0);
+  const bookedSeats = bookings.length;
+  const avail = totalSlots - bookedSeats;
+  const fill = totalSlots > 0 ? Math.round((bookedSeats / totalSlots) * 100) : 0;
+
+  document.getElementById('stat-total').textContent = slots.length;
+  document.getElementById('stat-booked').textContent = bookedSeats;
+  document.getElementById('stat-avail').textContent = Math.max(0, avail);
+  document.getElementById('stat-fill').textContent = fill + '%';
+
+  // Table
+  const wrap = document.getElementById('report-table-wrap');
+  if (bookings.length === 0) {
+    wrap.innerHTML = `<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">No bookings yet.</div></div>`;
+  } else {
+    const rows = bookings.map(b => {
+      const slot = slots.find(s => s.id === b.slotId);
+      const dt = slot ? fmtDatetime(slot) : '(slot removed)';
+      return `<tr>
+        <td>${b.name}</td>
+        <td style="color:var(--text2)">${b.email}</td>
+        <td>${dt}</td>
+        <td>${slot ? (slot.location || '—') : '—'}</td>
+        <td><span class="badge badge-green">Confirmed</span></td>
+      </tr>`;
+    }).join('');
+    wrap.innerHTML = `<table class="bookings-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Slot</th><th>Location</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  // Slot breakdown
+  const bd = document.getElementById('slot-breakdown');
+  if (slots.length === 0) {
+    bd.innerHTML = `<div class="text-sm text-muted">No slots to show.</div>`;
+  } else {
+    bd.innerHTML = slots.map(s => {
+      const pct = Math.round((s.booked / s.max) * 100);
+      const color = pct === 100 ? 'var(--success)' : pct > 50 ? 'var(--warn)' : 'var(--accent)';
+      return `<div style="margin-bottom:14px">
+        <div class="flex-between" style="font-size:13px; margin-bottom:4px">
+          <span>${fmtDate(s.date)} ${fmtTime(s.time)}</span>
+          <span style="color:var(--text2)">${s.booked}/${s.max} · ${pct}%</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%; background:${color}"></div></div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Export CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (bookings.length === 0) { toast('No bookings to export.'); return; }
+  const header = 'Name,Email,Date,Time,Duration,Location,Booked At\n';
+  const rows = bookings.map(b => {
+    const slot = slots.find(s => s.id === b.slotId);
+    return [b.name, b.email, b.date, b.time, b.duration, b.location || '', b.bookedAt].map(v => `"${v}"`).join(',');
+  }).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'bookings.csv'; a.click();
+  toast('CSV downloaded!');
+}
+
+// ── Keyboard: close modal on Escape ──────────────────────────────────────────
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Seed a couple of example slots ───────────────────────────────────────────
+(function seed() {
+  const today = new Date();
+  const d1 = new Date(today); d1.setDate(d1.getDate() + 3);
+  const d2 = new Date(today); d2.setDate(d2.getDate() + 5);
+  const d3 = new Date(today); d3.setDate(d3.getDate() + 7);
+
+  const fmt = d => d.toISOString().split('T')[0];
+  slots = [
+    { id: uid(), date: fmt(d1), time: '09:00', duration: 60, max: 2, location: 'Room 204', booked: 1 },
+    { id: uid(), date: fmt(d2), time: '14:00', duration: 45, max: 1, location: 'https://meet.google.com/xyz', booked: 0 },
+    { id: uid(), date: fmt(d3), time: '11:00', duration: 90, max: 3, location: 'Room 101', booked: 0 },
+  ];
+  bookings = [{ id: uid(), slotId: slots[0].id, name: 'Alice Makinen', email: 'alice@example.com', notes: '', date: slots[0].date, time: slots[0].time, duration: slots[0].duration, location: slots[0].location, bookedAt: new Date().toISOString() }];
+  renderSlots();
+})();
+</script>
+</body>
+</html>
